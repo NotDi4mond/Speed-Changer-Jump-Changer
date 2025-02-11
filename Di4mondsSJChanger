@@ -1,0 +1,124 @@
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 180)
+frame.Position = UDim2.new(0.5, -150, 0.5, -90)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+frame.BackgroundTransparency = 0.1
+frame.BorderSizePixel = 0
+frame.Visible = true
+frame.Parent = screenGui
+
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 12)
+uiCorner.Parent = frame
+
+local dragging, dragInput, dragStart, startPos
+local userInputService = game:GetService("UserInputService")
+local function update(input)
+    local delta = input.Position - dragStart
+    frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+userInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(0, 280, 0, 30)
+titleLabel.Position = UDim2.new(0.5, -140, 0, 5)
+titleLabel.Text = "Di4mond's S/J Power Changer"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextScaled = true
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.Parent = frame
+
+local titleStroke = Instance.new("UIStroke")
+titleStroke.Thickness = 2
+titleStroke.Color = Color3.fromRGB(0, 0, 0)
+titleStroke.Parent = titleLabel
+
+local instructionLabel = Instance.new("TextLabel")
+instructionLabel.Size = UDim2.new(0, 280, 0, 20)
+instructionLabel.Position = UDim2.new(0.5, -140, 1, -25)
+instructionLabel.Text = "Press K to toggle opening GUI"
+instructionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+instructionLabel.BackgroundTransparency = 1
+instructionLabel.TextScaled = true
+instructionLabel.Font = Enum.Font.SourceSans
+instructionLabel.Parent = frame
+
+local function createInput(labelText, position)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 100, 0, 30)
+    label.Position = position
+    label.Text = labelText
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.BackgroundTransparency = 1
+    label.Parent = frame
+    
+    local input = Instance.new("TextBox")
+    input.Size = UDim2.new(0, 150, 0, 30)
+    input.Position = UDim2.new(0, 130, position.Y.Scale, position.Y.Offset)
+    input.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    input.TextColor3 = Color3.fromRGB(255, 255, 255)
+    input.PlaceholderText = "Change Value"
+    input.Parent = frame
+    
+    local uiCorner = Instance.new("UICorner")
+    uiCorner.CornerRadius = UDim.new(0, 5)
+    uiCorner.Parent = input
+    
+    return input
+end
+
+local speedInput = createInput("Speed:", UDim2.new(0, 20, 0, 50))
+local jumpInput = createInput("Jump Height:", UDim2.new(0, 20, 0, 100))
+
+local function updateValues()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    
+    if humanoid then
+        local speed = tonumber(speedInput.Text)
+        local jump = tonumber(jumpInput.Text)
+        
+        if speed then
+            humanoid.WalkSpeed = speed
+        end
+        
+        if jump then
+            humanoid.JumpPower = jump
+        end
+    end
+end
+
+speedInput.FocusLost:Connect(updateValues)
+jumpInput.FocusLost:Connect(updateValues)
+
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.K then
+        frame.Visible = not frame.Visible
+    end
+end)
