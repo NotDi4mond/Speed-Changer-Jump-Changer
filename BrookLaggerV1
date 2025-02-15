@@ -1,9 +1,4 @@
-local hint = Instance.new("Hint")
-Hint.Parent = workspace
-Hint.Text = "[☁️] BrookLaggerV1 Loaded!"
-wait(2)
-Hint.Text = ""
-
+-- Warning: Over 20k Ping!!!
 local player = game.Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
