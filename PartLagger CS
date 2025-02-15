@@ -1,0 +1,59 @@
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Create GUI
+local Gui = Instance.new("ScreenGui")
+Gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local TextLabel = Instance.new("TextLabel")
+TextLabel.Parent = Gui
+TextLabel.Size = UDim2.new(0, 200, 0, 50)
+TextLabel.Position = UDim2.new(0.5, -100, 0, 10)
+TextLabel.TextScaled = true
+TextLabel.BackgroundColor3 = Color3.new(0.0666667, 0, 1)
+TextLabel.BackgroundTransparency = 0.4
+TextLabel.TextColor3 = Color3.new(1, 1, 1)
+TextLabel.Text = "Parts: 0"
+
+local GuiCorner = Instance.new("UICorner")
+GuiCorner.Parent = TextLabel
+
+-- Variables
+local parts = 0
+local spawnAmount = 10 -- Adjust for more lag
+local LagOn = true
+
+-- Create a folder for the lag parts
+local Folder = Instance.new("Folder")
+Folder.Name = "ClientLagParts"
+Folder.Parent = workspace
+
+-- Function to spawn lag parts
+local function lag(amount)
+	local SpawnArea = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character.HumanoidRootPart.Position or Vector3.new(0, 10, 0)
+	
+	for i = 1, amount do
+		local LagPart = Instance.new("Part")
+		LagPart.Parent = Folder
+		LagPart.Anchored = false
+		LagPart.Size = Vector3.new(1, 1, 1)
+		LagPart.Transparency = 0.5
+		LagPart.Material = Enum.Material.Neon
+		LagPart.Color = Color3.new(0.196078, 0.0901961, 1)
+		LagPart.Position = SpawnArea + Vector3.new(math.random(-5, 5), math.random(-5, 5), math.random(-5, 5))
+	end
+end
+
+-- Update UI smoothly
+RunService.RenderStepped:Connect(function()
+	TextLabel.Text = "Parts: " .. #Folder:GetChildren()
+end)
+
+-- Start spawning lag parts
+while LagOn do
+	lag(spawnAmount)
+	parts = #Folder:GetChildren()
+	warn("Client-Side Lag Parts: " .. parts)
+	task.wait(0.1) -- Reduce for more spam
+end
