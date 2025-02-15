@@ -42,7 +42,7 @@ local function startCode()
     while wait() do
         local args = {
             [1] = "PickingCar",
-            [2] = "SemiPass"
+            [2] = "Horse"
         }
 
         ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer(unpack(args))
